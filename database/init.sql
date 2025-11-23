@@ -12,9 +12,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- ============================================================
--- PROFILES TABLE (User information)
--- ============================================================
+-- Profiles table
 CREATE TABLE IF NOT EXISTS profiles (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   email TEXT NOT NULL UNIQUE,
@@ -35,9 +33,7 @@ CREATE TRIGGER update_profiles_updated_at
   FOR EACH ROW
   EXECUTE FUNCTION update_updated_at_column();
 
--- ============================================================
--- ML MODELS TABLE
--- ============================================================
+-- ML Models
 CREATE TABLE IF NOT EXISTS ml_models (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   name TEXT NOT NULL,
@@ -85,9 +81,7 @@ INSERT INTO ml_models (name, description, cost_per_prediction, input_schema, mod
     'recommendation'
   );
 
--- ============================================================
--- PREDICTIONS TABLE
--- ============================================================
+-- Predictions
 CREATE TYPE prediction_status AS ENUM ('pending', 'processing', 'completed', 'failed');
 
 CREATE TABLE IF NOT EXISTS predictions (
@@ -109,9 +103,7 @@ CREATE INDEX idx_predictions_user_id ON predictions(user_id);
 CREATE INDEX idx_predictions_status ON predictions(status);
 CREATE INDEX idx_predictions_created_at ON predictions(created_at DESC);
 
--- ============================================================
--- TRANSACTIONS TABLE
--- ============================================================
+-- Transactions
 CREATE TYPE transaction_type AS ENUM ('top_up', 'deduction', 'refund', 'admin_adjustment');
 
 CREATE TABLE IF NOT EXISTS transactions (
@@ -129,9 +121,7 @@ CREATE TABLE IF NOT EXISTS transactions (
 CREATE INDEX idx_transactions_user_id ON transactions(user_id);
 CREATE INDEX idx_transactions_created_at ON transactions(created_at DESC);
 
--- ============================================================
--- HELPER FUNCTIONS
--- ============================================================
+-- Helper functions
 
 -- Top-up balance
 CREATE OR REPLACE FUNCTION create_top_up_transaction(
