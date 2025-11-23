@@ -1,0 +1,55 @@
+# ===================================
+# Stage 1: Build React frontend
+# ===================================
+FROM node:20-alpine AS builder
+
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+
+# Install dependencies
+RUN npm install
+
+# Copy source code
+COPY . .
+
+# Build production bundle
+RUN npm run build
+
+# ===================================
+# Stage 2: Serve with Nginx
+# ===================================
+FROM nginx:alpine
+
+# Copy built files from builder stage
+COPY --from=builder /app/dist /usr/share/nginx/html
+
+# Create nginx configuration inline
+RUN echo 'events { worker_connections 1024; } \
+    http { \
+    include /etc/nginx/mime.types; \
+    default_type application/octet-stream; \
+    upstream backend_api { server app:3001; } \
+    server { \
+    listen 80; \
+    root /usr/share/nginx/html; \
+    index index.html; \
+    location / { try_files $uri $uri/ /index.html; } \
+    location /api/ { \
+    proxy_pass http://backend_api; \
+    proxy_set_header Host $host; \
+    proxy_set_header X-Real-IP $remote_addr; \
+    } \
+    } \
+    server { \
+    listen 443 ssl; \
+    return 301 http://$server_name$request_uri; \
+    } \
+    }' > /etc/nginx/nginx.conf
+
+# Expose ports
+EXPOSE 80 443
+
+# Start nginx
+CMD ["nginx", "-g", "daemon off;"]

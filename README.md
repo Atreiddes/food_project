@@ -1,33 +1,46 @@
-# ML Service - Object Model
+# ML Service Project
 
-Проект для курса по разработке. Реализация объектной модели ML сервиса.
+Два задания для курса: объектная модель и Docker.
 
-## Структура
+## Задание 1: Object Model
 
-- `src/types/ml-service.ts` - основные классы
-- `database/init.sql` - схема БД
+Объектная модель с применением ООП принципов.
 
-## Классы
+**Файлы:**
+- `src/types/ml-service.ts` - классы (User, MLModel, Prediction, Transaction)
+- `database/init.sql` - схема PostgreSQL
 
-- **BaseEntity** - базовый класс
-- **User** - пользователь с балансом  
-- **MLModel** - модель ML
-- **Prediction** - предсказание
-- **Transaction** - транзакция
+**Принципы ООП:**
+- Наследование (BaseEntity)
+- Инкапсуляция (приватные поля)
+- Полиморфизм (разное поведение методов)
 
-## Установка
+## Задание 2: Docker
 
-```bash
-npm install
-npm run dev
-```
+4 сервиса в Docker Compose.
 
-## База данных
+**Файлы:**
+- `docker-compose.yml` - конфигурация
+- `backend/Dockerfile` - API сервис
+- `Dockerfile.frontend` - фронтенд
+- `.env.example` - пример переменных
 
-PostgreSQL с таблицами profiles, ml_models, predictions, transactions.
+**Сервисы:**
+1. **database** - PostgreSQL
+2. **rabbitmq** - очередь
+3. **app** - Node.js API
+4. **web-proxy** - Nginx
 
 ## Запуск
 
 ```bash
-docker-compose up
+# Скопировать .env
+cp .env.example .env
+
+# Заполнить переменные в .env
+
+# Запустить
+docker-compose up --build
 ```
+
+Откроется на http://localhost
