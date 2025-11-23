@@ -1,9 +1,7 @@
 // ML Service - модель данных
 // Классы для работы с ML сервисом
 
-// ============================================================================
-// ENUMS
-// ============================================================================
+// Enums
 
 export enum UserRole {
   USER = 'user',
@@ -31,9 +29,7 @@ export enum ModelType {
   OPTIMIZATION = 'optimization'
 }
 
-// ============================================================================
-// VALIDATION ERROR TYPES
-// ============================================================================
+// Validation
 
 export interface ValidationError {
   field: string;
@@ -180,9 +176,7 @@ export class User extends BaseEntity {
   }
 }
 
-// ============================================================================
-// ML MODEL CLASS (with input validation)
-// ============================================================================
+// ML Model
 
 export interface MLModelData {
   id: string;
@@ -298,9 +292,7 @@ export class MLModel extends BaseEntity {
   }
 }
 
-// ============================================================================
-// PREDICTION CLASS (with status management)
-// ============================================================================
+// Prediction
 
 export interface PredictionData {
   id: string;
@@ -399,9 +391,7 @@ export class Prediction extends BaseEntity {
   }
 }
 
-// ============================================================================
-// TRANSACTION CLASS (for audit trail)
-// ============================================================================
+// Transaction
 
 export interface TransactionData {
   id: string;
@@ -488,9 +478,7 @@ export class Transaction extends BaseEntity {
   }
 }
 
-// ============================================================================
-// HELPER TYPES
-// ============================================================================
+// Helper types
 
 export interface CreatePredictionRequest {
   model_id: string;
