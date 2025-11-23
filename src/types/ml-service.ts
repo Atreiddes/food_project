@@ -1,9 +1,5 @@
-/**
- * ML Service Type Definitions
- * 
- * This file contains the core object model for the ML service,
- * implementing OOP principles: encapsulation, inheritance, and polymorphism.
- */
+// ML Service - модель данных
+// Классы для работы с ML сервисом
 
 // ============================================================================
 // ENUMS
@@ -57,7 +53,7 @@ export class ValidationResult {
   constructor(
     public isValid: boolean,
     public errors: ValidationError[] = []
-  ) {}
+  ) { }
 
   addError(error: ValidationError): void {
     this.errors.push(error);
@@ -73,9 +69,7 @@ export class ValidationResult {
   }
 }
 
-// ============================================================================
-// BASE ENTITY CLASS (for inheritance)
-// ============================================================================
+// Базовый класс для наследования
 
 export abstract class BaseEntity {
   id?: string;
@@ -98,9 +92,7 @@ export abstract class BaseEntity {
   }
 }
 
-// ============================================================================
-// USER CLASS (with balance management encapsulation)
-// ============================================================================
+// Класс пользователя
 
 export interface UserProfile {
   id: string;
@@ -120,7 +112,7 @@ export class User extends BaseEntity {
   full_name?: string;
   username?: string;
   role: UserRole;
-  private _balance: number; // Encapsulated - private field
+  private _balance: number;
   total_predictions: number;
   total_spent: number;
 
@@ -135,7 +127,7 @@ export class User extends BaseEntity {
     this.total_spent = data.total_spent || 0;
   }
 
-  // Balance management methods (encapsulation)
+  // Методы для работы с балансом
   getBalance(): number {
     return this._balance;
   }
@@ -148,8 +140,7 @@ export class User extends BaseEntity {
     return this.hasSufficientBalance(cost);
   }
 
-  // These methods should only be called by the backend
-  // In a real implementation, these would be protected
+  // TODO: добавить защиту, вызывать только из бэкенда
   addCredits(amount: number): void {
     if (amount < 0) {
       throw new Error('Cannot add negative credits');
@@ -242,7 +233,7 @@ export class MLModel extends BaseEntity {
 
   validateInput(inputData: any): ValidationResult {
     const result = new ValidationResult(true);
-    
+
     if (!this.input_schema || !this.input_schema.properties) {
       return result;
     }
