@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ML Service Dashboard</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+        .content { padding: 40px; }
+        .status-card {
+            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            border-left: 5px solid #4caf50;
+        }
+        .status-card h2 {
+            color: #2e7d32;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+        }
+        .services {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .service {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            border: 2px solid #4caf50;
+            transition: transform 0.2s;
+        }
+        .service:hover { transform: translateY(-5px); }
+        .service-icon { font-size: 2em; margin-bottom: 10px; }
+        .api-test {
+            background: #f5f5f5;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.1em;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            font-weight: 600;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102,126,234,0.4);
+        }
+        button:active { transform: translateY(0); }
+        pre {
+            background: #263238;
+            color: #aed581;
+            padding: 20px;
+            border-radius: 10px;
+            overflow-x: auto;
+            margin-top: 15px;
+            font-size: 0.9em;
+        }
+        .links {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+        .link-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px solid #667eea;
+            transition: all 0.2s;
+        }
+        .link-card:hover {
+            background: #667eea;
+            transform: translateY(-3px);
+        }
+        .link-card:hover a { color: white; }
+        .link-card a {
+            text-decoration: none;
+            color: #667eea;
+            font-weight: 600;
+            font-size: 1.1em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>ML Service Dashboard</h1>
+            <p>Docker microservices architecture</p>
+        </div>
+        <div class="content">
+            <div class="status-card">
+                <h2>All Systems Operational</h2>
+                <p style="margin-bottom:20px;color:#666;"><strong>Assignment 2: Docker</strong> - 4 services running</p>
+                <div class="services">
+                    <div class="service">
+                        <div class="service-icon">DB</div>
+                        <div>PostgreSQL</div>
+                        <div style="color:#4caf50;font-size:0.9em;margin-top:5px;">Healthy</div>
+                    </div>
+                    <div class="service">
+                        <div class="service-icon">MQ</div>
+                        <div>RabbitMQ</div>
+                        <div style="color:#4caf50;font-size:0.9em;margin-top:5px;">Healthy</div>
+                    </div>
+                    <div class="service">
+                        <div class="service-icon">API</div>
+                        <div>Node.js Backend</div>
+                        <div style="color:#4caf50;font-size:0.9em;margin-top:5px;">Running</div>
+                    </div>
+                    <div class="service">
+                        <div class="service-icon">WEB</div>
+                        <div>Nginx Proxy</div>
+                        <div style="color:#4caf50;font-size:0.9em;margin-top:5px;">Running</div>
+                    </div>
+                </div>
+            </div>
+            <div class="api-test">
+                <h3 style="margin-bottom:15px;">Test API Connection</h3>
+                <button onclick="testAPI()">Load ML Models from API</button>
+                <pre id="result">Click button to test backend API...</pre>
+            </div>
+            <div class="api-test">
+                <h3 style="margin-bottom:15px;">Quick Access</h3>
+                <div class="links">
+                    <div class="link-card">
+                        <a href="/api/models" target="_blank">Backend API (JSON)</a>
+                    </div>
+                    <div class="link-card">
+                        <a href="http://localhost:15672" target="_blank">RabbitMQ Management UI</a>
+                        <div style="font-size:0.8em;color:#999;margin-top:5px;">guest / guest</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        async function testAPI() {
+            const result = document.getElementById("result");
+            result.textContent = "Loading from backend...";
+            try {
+                const response = await fetch("/api/models");
+                const data = await response.json();
+                result.textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                result.textContent = "Error: " + error.message;
+            }
+        }
+    </script>
+</body>
+</html>

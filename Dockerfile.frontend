@@ -1,31 +1,15 @@
-# Stage 1: Build
-FROM node:20-alpine AS builder
-
-WORKDIR /app
-
-# Copy package files
-COPY package*.json ./
-
-# Install dependencies
-RUN npm install
-
-# Copy source code
-COPY . .
-
-# Build production bundle
-RUN npm run build
-
-# Stage 2: Nginx
+# Simple frontend with Nginx
 FROM nginx:alpine
 
-# Copy built files from builder stage
-COPY --from=builder /app/dist /usr/share/nginx/html
+# Copy HTML file
+COPY frontend/index.html /usr/share/nginx/html/index.html
 
-# Create nginx configuration inline
+# Create nginx config
 RUN echo 'events { worker_connections 1024; } \
     http { \
     include /etc/nginx/mime.types; \
     default_type application/octet-stream; \
+    charset utf-8; \
     upstream backend_api { server app:3001; } \
     server { \
     listen 80; \
@@ -38,14 +22,8 @@ RUN echo 'events { worker_connections 1024; } \
     proxy_set_header X-Real-IP $remote_addr; \
     } \
     } \
-    server { \
-    listen 443 ssl; \
-    return 301 http://$server_name$request_uri; \
-    } \
     }' > /etc/nginx/nginx.conf
 
-# Expose ports
-EXPOSE 80 443
+EXPOSE 80
 
-# Start nginx
 CMD ["nginx", "-g", "daemon off;"]
