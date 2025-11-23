@@ -1,73 +1,72 @@
-# Welcome to your Lovable project
+# ML Сервис - Личный кабинет пользователя
 
-## Project info
+Проект представляет собой веб-приложение для работы с ML сервисом по рекомендациям правильного питания.
 
-**URL**: https://lovable.dev/projects/1c2708db-69e1-4d3b-882b-5ccbdf27ada3
+## Задание №1: Объектная модель сервиса
 
-## How can I edit this code?
+**Описание:** Проектирование объектной модели с применением принципов ООП (инкапсуляция, наследование, полиморфизм) и SOLID.
 
-There are several ways of editing your application.
+**Реализованные классы:**
 
-**Use Lovable**
+### Базовые сущности
+- `BaseEntity` ([src/models/base.ts](src/models/base.ts)) - абстрактный базовый класс для всех моделей
+- `User` ([src/models/User.ts](src/models/User.ts)) - модель пользователя с ролями и балансом
+- `MLModel` ([src/models/MLModel.ts](src/models/MLModel.ts)) - модель ML сервиса
+- `Transaction` ([src/models/Transaction.ts](src/models/Transaction.ts)) - модель финансовых транзакций
+- `Prediction` ([src/models/Prediction.ts](src/models/Prediction.ts)) - модель запроса к ML сервису и результата
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/1c2708db-69e1-4d3b-882b-5ccbdf27ada3) and start prompting.
+### Интерфейсы (SOLID: Dependency Inversion)
+- `IRepository` ([src/interfaces/IRepository.ts](src/interfaces/IRepository.ts)) - паттерн Repository для работы с БД
+- `IUserService` ([src/interfaces/IUserService.ts](src/interfaces/IUserService.ts)) - сервис управления пользователями
+- `IBalanceService` ([src/interfaces/IBalanceService.ts](src/interfaces/IBalanceService.ts)) - сервис управления балансом
+- `IMLService` ([src/interfaces/IMLService.ts](src/interfaces/IMLService.ts)) - сервис работы с ML моделями
+- `IValidator` ([src/interfaces/IValidator.ts](src/interfaces/IValidator.ts)) - валидация данных
 
-Changes made via Lovable will be committed automatically to this repo.
+### Применённые принципы ООП
 
-**Use your preferred IDE**
+**Инкапсуляция:**
+- Все поля классов объявлены как `private` или `protected`
+- Доступ к данным через геттеры и методы
+- Внутренняя логика скрыта от внешнего использования
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+**Наследование:**
+- Все модели наследуются от `BaseEntity`
+- Повторное использование кода (id, timestamps, validation)
+- Расширенные интерфейсы репозиториев
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+**Полиморфизм:**
+- Единый интерфейс `IRepository<T>` для разных типов сущностей
+- Абстрактный метод `validate()` с разной реализацией в каждом классе
+- Метод `toJSON()` для сериализации объектов
 
-Follow these steps:
+### Применённые принципы SOLID
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+- **Single Responsibility:** Каждый класс отвечает за одну сущность
+- **Open/Closed:** Классы открыты для расширения через наследование
+- **Liskov Substitution:** Наследники BaseEntity взаимозаменяемы
+- **Interface Segregation:** Специфичные интерфейсы для каждого сервиса
+- **Dependency Inversion:** Зависимость от абстракций (интерфейсов), а не конкретных реализаций
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+## Структура проекта
 
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+```
+src/
+├── models/              # Модели данных
+│   ├── base.ts         # Базовый класс
+│   ├── User.ts         # Пользователь
+│   ├── MLModel.ts      # ML модель
+│   ├── Transaction.ts  # Транзакция
+│   ├── Prediction.ts   # Предсказание
+│   └── index.ts        # Экспорт моделей
+└── interfaces/         # Интерфейсы сервисов
+    ├── IRepository.ts
+    ├── IUserService.ts
+    ├── IBalanceService.ts
+    ├── IMLService.ts
+    └── IValidator.ts
 ```
 
-**Edit a file directly in GitHub**
+## Технологии
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
-
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
 - TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/1c2708db-69e1-4d3b-882b-5ccbdf27ada3) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+- Принципы ООП и SOLID
