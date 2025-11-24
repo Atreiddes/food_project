@@ -15,37 +15,13 @@
 - `Transaction` ([src/models/Transaction.ts](src/models/Transaction.ts)) - модель финансовых транзакций
 - `Prediction` ([src/models/Prediction.ts](src/models/Prediction.ts)) - модель запроса к ML сервису и результата
 
-### Интерфейсы (SOLID: Dependency Inversion)
+### Интерфейсы
 - `IRepository` ([src/interfaces/IRepository.ts](src/interfaces/IRepository.ts)) - паттерн Repository для работы с БД
 - `IUserService` ([src/interfaces/IUserService.ts](src/interfaces/IUserService.ts)) - сервис управления пользователями
 - `IBalanceService` ([src/interfaces/IBalanceService.ts](src/interfaces/IBalanceService.ts)) - сервис управления балансом
 - `IMLService` ([src/interfaces/IMLService.ts](src/interfaces/IMLService.ts)) - сервис работы с ML моделями
 - `IValidator` ([src/interfaces/IValidator.ts](src/interfaces/IValidator.ts)) - валидация данных
 
-### Применённые принципы ООП
-
-**Инкапсуляция:**
-- Все поля классов объявлены как `private` или `protected`
-- Доступ к данным через геттеры и методы
-- Внутренняя логика скрыта от внешнего использования
-
-**Наследование:**
-- Все модели наследуются от `BaseEntity`
-- Повторное использование кода (id, timestamps, validation)
-- Расширенные интерфейсы репозиториев
-
-**Полиморфизм:**
-- Единый интерфейс `IRepository<T>` для разных типов сущностей
-- Абстрактный метод `validate()` с разной реализацией в каждом классе
-- Метод `toJSON()` для сериализации объектов
-
-### Применённые принципы SOLID
-
-- **Single Responsibility:** Каждый класс отвечает за одну сущность
-- **Open/Closed:** Классы открыты для расширения через наследование
-- **Liskov Substitution:** Наследники BaseEntity взаимозаменяемы
-- **Interface Segregation:** Специфичные интерфейсы для каждого сервиса
-- **Dependency Inversion:** Зависимость от абстракций (интерфейсов), а не конкретных реализаций
 
 ## Структура проекта
 
@@ -65,8 +41,3 @@ src/
     ├── IMLService.ts
     └── IValidator.ts
 ```
-
-## Технологии
-
-- TypeScript
-- Принципы ООП и SOLID
