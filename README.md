@@ -93,6 +93,168 @@ backend_fastapi/
         └── 002_separate_user_balance.sql
 ```
 
+## Задание №3: Подключение базы данных с ORM
+
+**Описание:** Подключить к объектной модели приложения (созданной на прошлом уроке) базу данных с использованием ORM фреймворка.
+
+**Требования:**
+1. Протестировать работоспособность системы:
+   - Создание пользователей
+   - Пополнение баланса
+   - Списание кредитов с баланса
+   - Получение истории транзакций и т.д.
+
+2. Подготовить сценарий инициализации базы данных стандартными данными:
+   - Демо пользователь
+   - Демо администратор
+   - Базовые модели доступные для работы и т.д.
+
+**Формат ответа:** Ссылка на merge request
+
+### Реализация
+
+#### ORM подключение (SQLAlchemy)
+
+Подключение к БД реализовано в [backend_fastapi/app/db/base.py](backend_fastapi/app/db/base.py):
+
+```python
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+
+engine = create_engine(settings.DATABASE_URL, pool_pre_ping=True)
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+Base = declarative_base()
+
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+```
+
+#### Seed скрипт (инициализация демо-данных)
+
+**Файл:** [backend_fastapi/app/db/seed.py](backend_fastapi/app/db/seed.py)
+
+**Запуск:**
+```bash
+cd backend_fastapi
+python -m app.db.seed
+```
+
+**Создаваемые данные:**
+
+| Тип | Email | Пароль | Баланс |
+|-----|-------|--------|--------|
+| User | demo@nutrimarket.com | demo123456 | 1000.00 |
+| Admin | admin@nutrimarket.com | admin123456 | 10000.00 |
+| User | test@nutrimarket.com | test123456 | 500.00 |
+
+**ML модели:**
+- `mistral` - Mistral Model (active)
+- `nutrition-predictor` - Nutrition Predictor (active)
+- `meal-optimizer` - Meal Plan Optimizer (active)
+- `ingredient-substitute` - Ingredient Substitution (inactive)
+
+**Архитектура seed-скрипта (SOLID):**
+
+```
+BaseSeeder (Abstract)        <- DIP, OCP
+    ├── UserSeeder           <- SRP (только пользователи)
+    ├── MLModelSeeder        <- SRP (только ML модели)
+    └── TransactionSeeder    <- SRP (только транзакции)
+
+DatabaseSeeder (Orchestrator) <- координация
+```
+
+#### Тестовый скрипт (проверка работоспособности)
+
+**Файл:** [backend_fastapi/app/db/test_operations.py](backend_fastapi/app/db/test_operations.py)
+
+**Запуск:**
+```bash
+cd backend_fastapi
+python -m app.db.test_operations
+```
+
+**Тестируемые операции:**
+
+1. **User Operations:**
+   - Создание пользователя
+   - Создание пользователя с балансом (SRP)
+   - Хеширование паролей
+   - Назначение ролей
+   - Проверка уникальности email
+
+2. **Balance Operations:**
+   - Пополнение баланса
+   - Списание с баланса
+   - Проверка недостаточного баланса
+
+3. **Transaction Operations:**
+   - Создание депозита (DEPOSIT)
+   - Создание списания (WITHDRAW)
+   - Получение истории транзакций
+
+4. **ML Model Operations:**
+   - Создание ML модели
+   - Активация/деактивация модели
+
+**Архитектура тестов (SOLID):**
+
+```
+BaseTest (Abstract)          <- DIP, OCP
+    ├── UserTest             <- SRP
+    ├── BalanceTest          <- SRP
+    ├── TransactionTest      <- SRP
+    └── MLModelTest          <- SRP
+
+TestRunner (Orchestrator)    <- координация
+```
+
+### API Endpoints для работы с данными
+
+| Endpoint | Метод | Описание |
+|----------|-------|----------|
+| `/api/auth/register` | POST | Регистрация пользователя |
+| `/api/auth/login` | POST | Авторизация |
+| `/api/auth/guest` | POST | Гостевой вход |
+| `/api/auth/me` | GET | Информация о пользователе |
+| `/api/balance/` | GET | Получить баланс |
+| `/api/balance/add` | POST | Пополнить баланс |
+| `/api/balance/transactions` | GET | История транзакций |
+| `/api/chat/message` | POST | ML запрос (списание) |
+
+### Пример использования API
+
+```bash
+# 1. Регистрация
+curl -X POST http://localhost:8001/api/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{"email": "user@example.com", "password": "password123"}'
+
+# 2. Получение баланса
+curl http://localhost:8001/api/balance/ \
+  -H "Authorization: Bearer <token>"
+
+# 3. Пополнение баланса
+curl -X POST http://localhost:8001/api/balance/add \
+  -H "Authorization: Bearer <token>" \
+  -H "Content-Type: application/json" \
+  -d '{"amount": 100}'
+
+# 4. ML запрос (списание 10 кредитов)
+curl -X POST http://localhost:8001/api/chat/message \
+  -H "Authorization: Bearer <token>" \
+  -H "Content-Type: application/json" \
+  -d '{"message": "Что посоветуешь на завтрак?"}'
+
+# 5. История транзакций
+curl http://localhost:8001/api/balance/transactions \
+  -H "Authorization: Bearer <token>"
+```
+
 ## Технологии
 
 - **Python 3.11** - основной язык
