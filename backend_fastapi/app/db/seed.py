@@ -15,14 +15,10 @@ Usage:
     python -m app.db.seed
 """
 
-import sys
-import os
 from abc import ABC, abstractmethod
 from typing import List, Dict, Any, Optional
 from dataclasses import dataclass
-
-# Add parent directory to path for imports
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+import uuid
 
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
@@ -32,7 +28,6 @@ from app.models.user_balance import UserBalance
 from app.models.transaction import Transaction, TransactionType, TransactionStatus
 from app.models.ml_model import MLModel
 from app.core.security import get_password_hash
-import uuid
 
 
 # ============================================================

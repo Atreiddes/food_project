@@ -16,16 +16,12 @@ Usage:
     python -m app.db.test_operations
 """
 
-import sys
-import os
 from abc import ABC, abstractmethod
 from typing import Optional, List, Tuple
 from dataclasses import dataclass
 from decimal import Decimal
 from enum import Enum
-
-# Add parent directory to path for imports
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+import uuid
 
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
@@ -36,7 +32,6 @@ from app.models.transaction import Transaction, TransactionType, TransactionStat
 from app.models.prediction import Prediction, PredictionStatus
 from app.models.ml_model import MLModel
 from app.core.security import get_password_hash, verify_password
-import uuid
 
 
 # ============================================================

@@ -9,17 +9,12 @@ Usage:
     python -m app.db.test_local
 """
 
-import sys
-import os
 from decimal import Decimal
 from datetime import datetime
-
-# Add parent directory to path
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+import uuid
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-import uuid
 
 
 # Create SQLite in-memory database for testing
