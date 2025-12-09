@@ -1,26 +1,57 @@
 version: '3.8'
 
 services:
-  # Основное приложение
-  app:
+  api:
     build:
-      context: .
+      context: ./backend_fastapi
       dockerfile: Dockerfile
-    container_name: nutrimarket_app
+    container_name: nutrimarket_api
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
     env_file:
       - .env
+    environment:
+      - DB_HOST=database
+      - RABBITMQ_HOST=rabbitmq
+      - OLLAMA_URL=http://ollama:11434
+    ports:
+      - "8001:8000"
     volumes:
-      - ./src:/app/src
-      - ./public:/app/public
-      - ./node_modules:/app/node_modules
+      - ./backend_fastapi:/app
     depends_on:
-      - database
-      - rabbitmq
+      database:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
     networks:
       - ml-service-network
     restart: unless-stopped
 
-  # Nginx прокси
+  worker:
+    build:
+      context: ./backend_fastapi
+      dockerfile: Dockerfile
+    command: python -m app.workers.run
+    env_file:
+      - .env
+    environment:
+      - DB_HOST=database
+      - RABBITMQ_HOST=rabbitmq
+      - OLLAMA_URL=http://ollama:11434
+    volumes:
+      - ./backend_fastapi:/app
+    depends_on:
+      database:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      ollama:
+        condition: service_started
+    deploy:
+      replicas: 3
+    networks:
+      - ml-service-network
+    restart: unless-stopped
+
   web-proxy:
     image: nginx:alpine
     container_name: nutrimarket_nginx
@@ -32,12 +63,11 @@ services:
       - ./nginx/conf.d:/etc/nginx/conf.d:ro
       - ./nginx/ssl:/etc/nginx/ssl:ro
     depends_on:
-      - app
+      - api
     networks:
       - ml-service-network
     restart: unless-stopped
 
-  # RabbitMQ
   rabbitmq:
     image: rabbitmq:3-management-alpine
     container_name: nutrimarket_rabbitmq
@@ -49,28 +79,36 @@ services:
       RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASS:-admin}
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
-    restart: on-failure
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     networks:
       - ml-service-network
+    restart: on-failure
 
-  # PostgreSQL Database
   database:
     image: postgres:15-alpine
     container_name: nutrimarket_db
     environment:
-      POSTGRES_DB: ${DB_NAME:-ml_service}
-      POSTGRES_USER: ${DB_USER:-postgres}
-      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
+      POSTGRES_DB: ${DB_NAME:-nutrimarket_db}
+      POSTGRES_USER: ${DB_USER:-nutrimarket_user}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-nutrimarket_pass}
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
     ports:
       - "5432:5432"
-    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-nutrimarket_user} -d ${DB_NAME:-nutrimarket_db}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
     networks:
       - ml-service-network
+    restart: unless-stopped
 
-  # Ollama для ML модели
   ollama:
     image: ollama/ollama:latest
     container_name: nutrimarket_ollama
@@ -78,9 +116,9 @@ services:
       - ollama_data:/root/.ollama
     ports:
       - "11434:11434"
-    restart: unless-stopped
     networks:
       - ml-service-network
+    restart: unless-stopped
 
 networks:
   ml-service-network:
