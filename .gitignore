@@ -3,6 +3,16 @@ node_modules/
 .pnp
 .pnp.js
 
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+.eggs/
+*.egg
+
 # Testing
 coverage/
 
