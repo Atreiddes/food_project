@@ -5,6 +5,7 @@ from typing import Callable, Awaitable, Optional
 import aio_pika
 from aio_pika import IncomingMessage
 
+from app.core.config import settings
 from .connection import RabbitMQConnection
 from .task_schema import MLTaskMessage
 
@@ -44,8 +45,8 @@ class BaseConsumer(ABC):
             self._queue_name,
             durable=True,
             arguments={
-                "x-message-ttl": 3600000,
-                "x-max-length": 10000,
+                "x-message-ttl": settings.QUEUE_MESSAGE_TTL,
+                "x-max-length": settings.QUEUE_MAX_LENGTH,
             }
         )
 
@@ -60,10 +61,8 @@ class BaseConsumer(ABC):
 
 
 class TaskConsumer(BaseConsumer):
-    QUEUE_NAME = "ml_tasks"
-
     def __init__(self, handler: MessageHandler):
-        super().__init__(self.QUEUE_NAME)
+        super().__init__(settings.QUEUE_NAME)
         self._handler = handler
 
     async def process_message(self, message: IncomingMessage) -> None:

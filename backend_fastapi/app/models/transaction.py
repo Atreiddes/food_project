@@ -8,6 +8,7 @@ class TransactionType(str, enum.Enum):
     DEPOSIT = "deposit"
     WITHDRAW = "withdraw"
     ML_REQUEST = "ml_request"
+    REFUND = "refund"
 
 
 class TransactionStatus(str, enum.Enum):

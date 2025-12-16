@@ -5,6 +5,7 @@ from typing import Optional
 import aio_pika
 from aio_pika import Message, DeliveryMode
 
+from app.core.config import settings
 from .connection import RabbitMQConnection
 from .task_schema import MLTaskMessage
 
@@ -31,10 +32,8 @@ class BasePublisher(ABC):
 
 
 class TaskPublisher(BasePublisher):
-    QUEUE_NAME = "ml_tasks"
-
     def __init__(self):
-        super().__init__(self.QUEUE_NAME)
+        super().__init__(settings.QUEUE_NAME)
 
     async def _declare_queue(self) -> aio_pika.Queue:
         await self._ensure_connection()
@@ -43,8 +42,8 @@ class TaskPublisher(BasePublisher):
             self._queue_name,
             durable=True,
             arguments={
-                "x-message-ttl": 3600000,
-                "x-max-length": 10000,
+                "x-message-ttl": settings.QUEUE_MESSAGE_TTL,
+                "x-max-length": settings.QUEUE_MAX_LENGTH,
             }
         )
         return queue

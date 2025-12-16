@@ -41,6 +41,11 @@ class Settings(BaseSettings):
     RABBITMQ_USER: str = "admin"
     RABBITMQ_PASS: str = "admin"
 
+    # Queue settings
+    QUEUE_NAME: str = "ml_tasks"
+    QUEUE_MESSAGE_TTL: int = 3600000  # 1 hour in milliseconds
+    QUEUE_MAX_LENGTH: int = 10000
+
     # CORS
     CORS_ORIGINS: str = "http://localhost:3000,http://localhost:5173"
     CORS_ALLOW_CREDENTIALS: bool = True

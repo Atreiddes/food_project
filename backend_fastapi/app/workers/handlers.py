@@ -1,10 +1,11 @@
 import logging
 from abc import ABC, abstractmethod
-from typing import Optional
+from decimal import Decimal
 
 from sqlalchemy.orm import Session
 
 from app.models.prediction import Prediction, PredictionStatus
+from app.services.balance import BalanceService, TransactionService
 from app.workers.base import WorkerResult
 
 
@@ -18,6 +19,8 @@ class BaseResultHandler(ABC):
 
 
 class PredictionResultHandler(BaseResultHandler):
+    """Handler for processing prediction results with refund on failure."""
+
     def handle(self, result: WorkerResult, db: Session) -> bool:
         try:
             prediction = db.query(Prediction).filter(
@@ -40,6 +43,8 @@ class PredictionResultHandler(BaseResultHandler):
                 prediction.error_message = result.error
                 prediction.result = {"error": result.error}
 
+                self._refund_user(db, prediction)
+
             db.commit()
 
             logger.info(
@@ -53,8 +58,38 @@ class PredictionResultHandler(BaseResultHandler):
             db.rollback()
             return False
 
+    def _refund_user(self, db: Session, prediction: Prediction) -> None:
+        """Refund the user when prediction fails."""
+        try:
+            refund_amount = Decimal(str(prediction.cost_charged))
+
+            if refund_amount <= 0:
+                return
+
+            balance_service = BalanceService(db)
+            transaction_service = TransactionService(db)
+
+            balance_service.refund(prediction.user_id, refund_amount)
+
+            description = f"Refund for failed ML request: {prediction.id[:8]}..."
+            transaction_service.create_refund_transaction(
+                user_id=prediction.user_id,
+                amount=refund_amount,
+                description=description
+            )
+
+            logger.info(
+                f"Refunded {refund_amount} to user {prediction.user_id} "
+                f"for failed prediction {prediction.id}"
+            )
+
+        except Exception as e:
+            logger.error(f"Failed to refund user: {e}")
+
 
 class PredictionStatusUpdater:
+    """Utility class for updating prediction status."""
+
     def __init__(self, db: Session):
         self._db = db
 
