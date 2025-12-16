@@ -165,7 +165,7 @@ export const chatApi = {
 // Balance API
 export const balanceApi = {
   async getBalance(): Promise<BalanceResponse> {
-    const response = await fetch(`${API_URL}/api/balance`, {
+    const response = await fetch(`${API_URL}/api/balance/`, {
       headers: getAuthHeaders(),
     });
     return handleResponse<BalanceResponse>(response);
@@ -191,7 +191,7 @@ export const balanceApi = {
 // History API
 export const historyApi = {
   async getHistory(): Promise<HistoryResponse> {
-    const response = await fetch(`${API_URL}/api/history`, {
+    const response = await fetch(`${API_URL}/api/history/`, {
       headers: getAuthHeaders(),
     });
     return handleResponse<HistoryResponse>(response);
